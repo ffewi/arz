@@ -26,7 +26,6 @@
                         <phase>validate</phase>
                         <goals><goal>install-file</goal></goals>
                         <configuration>
-                            <!-- 修改为你的 jar 包名称 -->
                             <file>${project.basedir}/libs/arz-common-1.0.jar</file>
                             <groupId>com.github.ffewi.internal</groupId>
                             <artifactId>arz-common-libs</artifactId>
@@ -47,6 +46,12 @@
                         <goals><goal>shade</goal></goals>
                         <configuration>
                             <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <!-- 只打包 arz-common-libs，排除其他所有依赖 -->
+                            <artifactSet>
+                                <includes>
+                                    <include>com.github.ffewi.internal:arz-common-libs</include>
+                                </includes>
+                            </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>*:*</artifact>
