@@ -5,51 +5,32 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <!-- 不声明任何 dependency -->
-
     <build>
         <plugins>
 
-            <!-- 第一步：validate 阶段把本地 jar 安装到当前构建的本地仓库 -->
+            <!-- 直接用 ant 解压 jar 到 target/classes，完全不走 Maven 依赖系统 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>3.1.1</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>install-external</id>
-                        <phase>validate</phase>
-                        <goals><goal>install-file</goal></goals>
-                        <configuration>
-                            <file>${project.basedir}/libs/arz-common-1.0.jar</file>
-                            <groupId>com.github.ffewi.internal</groupId>
-                            <artifactId>arz-common-libs</artifactId>
-                            <version>1.0.0</version>
-                            <packaging>jar</packaging>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- 第二步：用 maven-dependency-plugin 把 jar 解压到 target/classes -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.1</version>
-                <executions>
-                    <execution>
-                        <id>unpack-jar</id>
+                        <id>unpack-local-jar</id>
                         <phase>generate-sources</phase>
-                        <goals><goal>unpack</goal></goals>
+                        <goals><goal>run</goal></goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.github.ffewi.internal</groupId>
-                                    <artifactId>arz-common-libs</artifactId>
-                                    <version>1.0.0</version>
-                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
+                            <target>
+                                <unzip src="${project.basedir}/libs/arz-common-1.0.jar"
+                                       dest="${project.build.outputDirectory}">
+                                    <!-- 排除原 jar 里的签名和 pom 信息 -->
+                                    <patternset>
+                                        <exclude name="META-INF/*.SF"/>
+                                        <exclude name="META-INF/*.DSA"/>
+                                        <exclude name="META-INF/*.RSA"/>
+                                        <exclude name="META-INF/maven/**"/>
+                                    </patternset>
+                                </unzip>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
