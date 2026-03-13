@@ -5,27 +5,34 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <!-- 将本地 jar 声明为 system scope 依赖 -->
+        <dependency>
+            <groupId>com.github.ffewi</groupId>
+            <artifactId>arz-common-internal</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/arz-common-1.0.jar</systemPath>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>3.1.1</version>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.2</version>
                 <executions>
                     <execution>
-                        <id>install-external-jar</id>
-                        <!-- 在 validate 阶段先把 jar 注册到本地仓库 -->
-                        <phase>validate</phase>
+                        <phase>package</phase>
                         <goals>
-                            <goal>install-file</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <file>${project.basedir}/libs/arz-common-1.0.jar</file>
-                            <groupId>com.github.ffewi</groupId>
-                            <artifactId>arz-common</artifactId>
-                            <version>${project.version}</version>
-                            <packaging>jar</packaging>
-                            <generatePom>true</generatePom>
+                            <!-- 把 system scope 的 jar 也一起打包进来 -->
+                            <includeSystemScope>true</includeSystemScope>
+                            <!-- 去掉多余的 shade 后缀，直接替换原始 jar -->
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                         </configuration>
                     </execution>
                 </executions>
