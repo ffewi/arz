@@ -177,6 +177,9 @@
     </dependencies>
 
     <build>
+        <!-- 指定空的源码目录，避免编译报错 -->
+        <sourceDirectory>src</sourceDirectory>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -184,30 +187,23 @@
                 <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <id>copy-jar</id>
-                        <phase>prepare-package</phase>
+                        <id>copy-prebuilt-jar</id>
+                        <phase>compile</phase>
                         <goals><goal>run</goal></goals>
                         <configuration>
                             <target>
-                                <!-- 直接把你的 jar 复制到 target，作为主产物 -->
-                                <copy file="${project.basedir}/libs/arz-common-1.0.jar"
-                                      tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"
-                                      overwrite="true"/>
+                                <!-- 解压 jar 内容到 target/classes，让 maven-jar-plugin 正常打包 -->
+                                <unzip src="${project.basedir}/libs/arz-common-1.0.jar"
+                                       dest="${project.build.outputDirectory}">
+                                    <patternset>
+                                        <exclude name="META-INF/*.SF"/>
+                                        <exclude name="META-INF/*.DSA"/>
+                                        <exclude name="META-INF/*.RSA"/>
+                                        <exclude name="META-INF/maven/**"/>
+                                    </patternset>
+                                </unzip>
                             </target>
                         </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- 跳过默认的 maven-jar-plugin 打包（因为我们已经有 jar 了） -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>none</phase>
                     </execution>
                 </executions>
             </plugin>
