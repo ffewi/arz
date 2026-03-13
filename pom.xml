@@ -5,17 +5,12 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.github.ffewi.internal</groupId>
-            <artifactId>arz-common-libs</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
+    <!-- 不声明任何 dependency -->
 
     <build>
         <plugins>
 
+            <!-- 第一步：validate 阶段把本地 jar 安装到当前构建的本地仓库 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-install-plugin</artifactId>
@@ -36,32 +31,25 @@
                 </executions>
             </plugin>
 
+            <!-- 第二步：用 maven-dependency-plugin 把 jar 解压到 target/classes -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.2</version>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.1</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
-                        <goals><goal>shade</goal></goals>
+                        <id>unpack-jar</id>
+                        <phase>generate-sources</phase>
+                        <goals><goal>unpack</goal></goals>
                         <configuration>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <!-- 只打包 arz-common-libs，排除其他所有依赖 -->
-                            <artifactSet>
-                                <includes>
-                                    <include>com.github.ffewi.internal:arz-common-libs</include>
-                                </includes>
-                            </artifactSet>
-                            <filters>
-                                <filter>
-                                    <artifact>*:*</artifact>
-                                    <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
-                                        <exclude>META-INF/*.DSA</exclude>
-                                        <exclude>META-INF/*.RSA</exclude>
-                                    </excludes>
-                                </filter>
-                            </filters>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.github.ffewi.internal</groupId>
+                                    <artifactId>arz-common-libs</artifactId>
+                                    <version>1.0.0</version>
+                                    <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
