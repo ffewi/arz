@@ -1,6 +1,6 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.你的GitHub用户名</groupId>
+    <groupId>com.github.ffewi</groupId>
     <artifactId>arz-common</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
